@@ -10,7 +10,12 @@
 
 aiofiles==24.1.0
     # via quart
+aiosqlite==0.17.0
+    # via tortoise-orm
 annotated-types==0.7.0
+    # via pydantic
+asyncpg==0.29.0
+    # via tortoise-orm
 blinker==1.6.3
     # via flask
     # via quart
@@ -18,7 +23,9 @@ click==8.1.7
     # via flask
     # via quart
 flask==3.0.3
+    # via flask-orjson
     # via quart
+flask-orjson==2.0.0
 h11==0.14.0
     # via hypercorn
     # via wsproto
@@ -30,6 +37,8 @@ hypercorn==0.17.3
     # via quart
 hyperframe==6.0.1
     # via h2
+iso8601==1.1.0
+    # via tortoise-orm
 itsdangerous==2.2.0
     # via flask
     # via quart
@@ -40,14 +49,26 @@ markupsafe==2.1.5
     # via jinja2
     # via quart
     # via werkzeug
+orjson==3.10.5
+    # via flask-orjson
 priority==2.0.0
     # via hypercorn
-pydantic==1.10.0
+pydantic==2.7.4
+    # via tortoise-orm
+pydantic-core==2.18.4
+    # via pydantic
+pypika-tortoise==0.1.6
+    # via tortoise-orm
 python-dotenv==1.0.1
     # via quart
+pytz==2024.1
+    # via tortoise-orm
 quart==0.19.6
+tortoise-orm==0.21.3
 typing-extensions==4.12.2
+    # via aiosqlite
     # via pydantic
+    # via pydantic-core
 ulid-py==1.1.0
 werkzeug==3.0.3
     # via flask
