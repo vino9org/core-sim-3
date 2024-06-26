@@ -1,15 +1,15 @@
 import logging
-import os
-import sys
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+import pytest
 
-cwd = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.abspath(f"{cwd}/.."))
+from app import app
 
-# the following import only works after sys.path is updated
+# suppress INFO logs to reduce noise in test output
+root_logger = logging.getLogger()
+root_logger.setLevel(logging.WARN)
 
 
-
-
+@pytest.fixture
+async def client():
+    async with app.test_client() as client:
+        yield client
