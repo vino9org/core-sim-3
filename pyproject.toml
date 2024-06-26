@@ -7,6 +7,10 @@ readme = "README.md"
 requires-python = ">= 3.12"
 dependencies = [
     "python-dotenv >= 1.0.0",
+    "quart[dotenv]>=0.19.6",
+    "annotated-types>=0.7.0",
+    "ulid-py>=1.1.0",
+    "pydantic==1.10",
 ]
 
 [tool.rye]
@@ -28,6 +32,7 @@ pre = "pre-commit run --all-files"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
+pythonpath = ["."]
 testpaths = ["tests"]
 filterwarnings = [
     "ignore::DeprecationWarning",

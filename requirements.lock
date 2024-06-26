@@ -8,4 +8,49 @@
 #   with-sources: false
 #   generate-hashes: false
 
+aiofiles==24.1.0
+    # via quart
+annotated-types==0.7.0
+blinker==1.6.3
+    # via flask
+    # via quart
+click==8.1.7
+    # via flask
+    # via quart
+flask==3.0.3
+    # via quart
+h11==0.14.0
+    # via hypercorn
+    # via wsproto
+h2==4.1.0
+    # via hypercorn
+hpack==4.0.0
+    # via h2
+hypercorn==0.17.3
+    # via quart
+hyperframe==6.0.1
+    # via h2
+itsdangerous==2.2.0
+    # via flask
+    # via quart
+jinja2==3.1.4
+    # via flask
+    # via quart
+markupsafe==2.1.5
+    # via jinja2
+    # via quart
+    # via werkzeug
+priority==2.0.0
+    # via hypercorn
+pydantic==1.10.0
 python-dotenv==1.0.1
+    # via quart
+quart==0.19.6
+typing-extensions==4.12.2
+    # via pydantic
+ulid-py==1.1.0
+werkzeug==3.0.3
+    # via flask
+    # via quart
+wsproto==1.2.0
+    # via hypercorn

@@ -8,18 +8,50 @@
 #   with-sources: false
 #   generate-hashes: false
 
+aiofiles==24.1.0
+    # via quart
+annotated-types==0.7.0
+blinker==1.6.3
+    # via flask
+    # via quart
 cfgv==3.4.0
     # via pre-commit
+click==8.1.7
+    # via flask
+    # via quart
 coverage==7.5.4
     # via pytest-cov
 distlib==0.3.8
     # via virtualenv
 filelock==3.15.4
     # via virtualenv
+flask==3.0.3
+    # via quart
+h11==0.14.0
+    # via hypercorn
+    # via wsproto
+h2==4.1.0
+    # via hypercorn
+hpack==4.0.0
+    # via h2
+hypercorn==0.17.3
+    # via quart
+hyperframe==6.0.1
+    # via h2
 identify==2.5.36
     # via pre-commit
 iniconfig==2.0.0
     # via pytest
+itsdangerous==2.2.0
+    # via flask
+    # via quart
+jinja2==3.1.4
+    # via flask
+    # via quart
+markupsafe==2.1.5
+    # via jinja2
+    # via quart
+    # via werkzeug
 mypy==1.10.1
 mypy-extensions==1.0.0
     # via mypy
@@ -32,6 +64,9 @@ platformdirs==4.2.2
 pluggy==1.5.0
     # via pytest
 pre-commit==3.7.1
+priority==2.0.0
+    # via hypercorn
+pydantic==1.10.0
 pytest==8.2.2
     # via pytest-asyncio
     # via pytest-cov
@@ -43,10 +78,19 @@ pytest-dotenv==0.5.2
 pytest-mock==3.14.0
 python-dotenv==1.0.1
     # via pytest-dotenv
+    # via quart
 pyyaml==6.0.1
     # via pre-commit
+quart==0.19.6
 ruff==0.4.10
 typing-extensions==4.12.2
     # via mypy
+    # via pydantic
+ulid-py==1.1.0
 virtualenv==20.26.3
     # via pre-commit
+werkzeug==3.0.3
+    # via flask
+    # via quart
+wsproto==1.2.0
+    # via hypercorn
