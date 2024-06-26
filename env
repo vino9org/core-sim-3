@@ -1,0 +1,7 @@
+
+# uses sqlite database for testing if below is not set
+# TEST_DATABASE_URL=postgresql+psycopg://username:password@server:port/test_database
+# KEEP_TEST_DB=N
+
+# univorn settings
+WORKERS=1

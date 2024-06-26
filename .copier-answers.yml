@@ -1,0 +1,11 @@
+_commit: 0.2.0
+_src_path: https://github.com/vino9org/python-copier-template
+asyncio_db: false
+db_type: none
+pkg_name: casa
+project_name: core-sim-3
+project_type: simple
+use_devcontainer: true
+use_docker: true
+use_github_action: true
+version: 0.1.0
