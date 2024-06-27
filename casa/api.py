@@ -19,7 +19,7 @@ async def get_account_details(
     if account:
         return account.model_dump()
     else:
-        return Response(status=404, response={"error": "Account not found or not active"})
+        return {"error": "Account not found or not active"}, 404
 
 
 @blueprint.route("/transfers", methods=["POST"])
