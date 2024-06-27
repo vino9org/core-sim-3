@@ -44,7 +44,10 @@ asyncio_mode = "auto"
 
 [tool.coverage.run]
 source = ["."]
-omit = ["tests/*"]
+omit = [
+    "tests/*",
+    "seed.py",
+]
 
 # see ruff configuration options at
 # https://docs.astral.sh/ruff/configuration/
