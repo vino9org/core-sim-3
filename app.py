@@ -31,7 +31,6 @@ async def ready():
 
 app.register_blueprint(casa_api, url_prefix="/api/casa")
 
-
 register_tortoise(
     app,
     db_url=os.environ.get("DATABASE_URL"),

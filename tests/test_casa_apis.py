@@ -1,11 +1,11 @@
-async def test_get_account_details(client):
+async def test_get_account_details(client, test_db):
     response = await client.get("/api/casa/accounts/1234567890")
     assert response.status_code == 200
     body = await response.json
     assert body["currency"] == "USD"
 
 
-async def test_get_account_not_found(client):
+async def test_get_account_not_found(client, test_db):
     response = await client.get("/api/casa/accounts/bad_account")
     assert response.status_code == 404
 
