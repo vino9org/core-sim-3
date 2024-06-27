@@ -5,11 +5,11 @@ from datetime import datetime
 from uuid import uuid4
 
 import pytest
+import tortoise.contrib.test as tortoise_test
 import ulid
 from tortoise import Tortoise
-from tortoise.backends.base.config_generator import generate_config
-from tortoise.contrib.test import _init_db
 
+# from tortoise.contrib.test import _init_db, getDBConfig
 from app import app
 from casa.models import AccountModel, TransactionModel, TransferModel
 
@@ -36,13 +36,10 @@ def event_loop():
 
 @pytest.fixture(scope="session")
 def test_db(request, event_loop):
-    config = generate_config(
-        os.environ.get("TEST_DATABASE_URL", "sql://:memory:"),
-        app_modules={"models": ["casa.models"]},
-        testing=True,
-        connection_label="models",
-    )
-    event_loop.run_until_complete(_init_db(config))
+    test_db_url = os.environ.get("TEST_DATABASE_URL", "sqlite://:memory:")
+    tortoise_test._TORTOISE_TEST_DB = test_db_url
+    config = tortoise_test.getDBConfig(app_label="models", modules=["casa.models"])
+    event_loop.run_until_complete(tortoise_test._init_db(config))
     event_loop.run_until_complete(seed_db())
 
     if os.environ.get("KEEP_TEST_DB", "N").upper() not in ["Y", "1"]:
