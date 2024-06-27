@@ -1,7 +1,9 @@
 import logging
 
-from quart import Blueprint, Response
+from pydantic import ValidationError
+from quart import Blueprint, Response, current_app, request
 
+from . import schemas as s
 from . import service
 
 logger = logging.getLogger(__name__)
@@ -15,17 +17,18 @@ async def get_account_details(
 ):
     account = await service.get_account_details(account_num)
     if account:
-        return account.dict()
+        return account.model_dump()
     else:
-        return Response(status=404)
+        return Response(status=404, response={"error": "Account not found or not active"})
 
 
-# @blueprint.route("/transfers", methods=["POST"])
-# async def transfer():
-#     try:
-#         transfer_req = schemas.TransferSchema.parse_obj(await request.json)
-#         result = await service.transfer(transfer_req)
-#         return result.dict(), 201
-#     except (service.InvalidRequest, ValidationError) as e:
-#         logger.info(f"Invalid request: {str(e)}")
-#         return Response({"error": str(e)}, status=422)
+@blueprint.route("/transfers", methods=["POST"])
+async def transfer():
+    try:
+        transfer_req = s.TransferRequest.model_validate(await request.json)
+        result, events = await service.transfer(transfer_req)
+        current_app.add_background_task(service.publish_events, events)
+        return result.model_dump(), 201
+    except (service.InvalidRequest, ValidationError) as e:
+        logger.info(f"Invalid request: {str(e)}")
+        return Response({"error": str(e)}, status=422)
