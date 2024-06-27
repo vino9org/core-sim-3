@@ -38,7 +38,7 @@ register_tortoise(
     app,
     db_url=os.environ.get("DATABASE_URL"),
     modules={"models": ["casa.models"]},
-    generate_schemas=True,
+    generate_schemas=False,
 )
 
 
