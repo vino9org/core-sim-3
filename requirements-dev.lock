@@ -8,6 +8,7 @@
 #   with-sources: false
 #   generate-hashes: false
 
+aerich==0.7.2
 aiofiles==24.1.0
     # via quart
 aiosqlite==0.17.0
@@ -22,10 +23,13 @@ blinker==1.6.3
 cfgv==3.4.0
     # via pre-commit
 click==8.1.7
+    # via aerich
     # via flask
     # via quart
 coverage==7.5.4
     # via pytest-cov
+dictdiffer==0.9.0
+    # via aerich
 distlib==0.3.8
     # via virtualenv
 filelock==3.15.4
@@ -78,6 +82,7 @@ pre-commit==3.7.1
 priority==2.0.0
     # via hypercorn
 pydantic==2.7.4
+    # via aerich
     # via tortoise-orm
 pydantic-core==2.18.4
     # via pydantic
@@ -101,7 +106,10 @@ pyyaml==6.0.1
     # via pre-commit
 quart==0.19.6
 ruff==0.4.10
+tomlkit==0.12.5
+    # via aerich
 tortoise-orm==0.21.3
+    # via aerich
 typing-extensions==4.12.2
     # via aiosqlite
     # via mypy

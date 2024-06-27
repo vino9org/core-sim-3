@@ -8,6 +8,7 @@
 #   with-sources: false
 #   generate-hashes: false
 
+aerich==0.7.2
 aiofiles==24.1.0
     # via quart
 aiosqlite==0.17.0
@@ -20,8 +21,11 @@ blinker==1.6.3
     # via flask
     # via quart
 click==8.1.7
+    # via aerich
     # via flask
     # via quart
+dictdiffer==0.9.0
+    # via aerich
 flask==3.0.3
     # via flask-orjson
     # via quart
@@ -54,6 +58,7 @@ orjson==3.10.5
 priority==2.0.0
     # via hypercorn
 pydantic==2.7.4
+    # via aerich
     # via tortoise-orm
 pydantic-core==2.18.4
     # via pydantic
@@ -64,7 +69,10 @@ python-dotenv==1.0.1
 pytz==2024.1
     # via tortoise-orm
 quart==0.19.6
+tomlkit==0.12.5
+    # via aerich
 tortoise-orm==0.21.3
+    # via aerich
 typing-extensions==4.12.2
     # via aiosqlite
     # via pydantic

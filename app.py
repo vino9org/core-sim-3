@@ -34,10 +34,19 @@ async def ready():
 
 app.register_blueprint(casa_api, url_prefix="/api/casa")
 
+TORTOISE_ORM = {
+    "connections": {"default": os.environ.get("DATABASE_URL")},
+    "apps": {
+        "models": {
+            "models": ["casa.models", "aerich.models"],
+            "default_connection": "default",
+        }
+    },
+}
+
 register_tortoise(
     app,
-    db_url=os.environ.get("DATABASE_URL"),
-    modules={"models": ["casa.models"]},
+    config=TORTOISE_ORM,
     generate_schemas=False,
 )
 

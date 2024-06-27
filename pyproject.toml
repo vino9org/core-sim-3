@@ -12,6 +12,7 @@ dependencies = [
     "ulid-py>=1.1.0",
     "tortoise-orm[asyncpg]>=0.21.3",
     "flask-orjson>=2.0.0",
+    "aerich>=0.7.2",
 ]
 
 [tool.rye]
@@ -80,3 +81,8 @@ module = [
     "dataclasses",
 ]
 ignore_missing_imports = true
+
+[tool.aerich]
+tortoise_orm = "app.TORTOISE_ORM"
+location = "./migrations"
+src_folder = "./."
