@@ -1,17 +1,7 @@
 
-# Welcome to Python project
+# Core Banking Simulator
 
-This project is set up Python project with dev tooling pre-configured
-
-* ruff
-* mypy
-* VS Code support
-
-## Setup
-
-The easiest way to get started is use [Visual Studio Code with devcontainer](https://code.visualstudio.com/docs/devcontainers/containers)
-
-[rye](https://github.com/astral-sh/rye) is the blazing fast python project manager tool. Install it first before proceeding.
+This a core banking simulator used in vino bank demo. It build with [Quart](https://palletsprojects.com/p/quart/) and [Tortoise ORM](https://tortoise.github.io/). [aerich]() is used for database schema migration.
 
 
 ## Quick Start
@@ -21,24 +11,18 @@ The easiest way to get started is use [Visual Studio Code with devcontainer](htt
 # the easiest way to install Rye
 curl -sSf https://rye.astral.sh/get | bash
 
-
-cd my_project_directory
-
 # create virtualenv and install dependencies
 rye sync
 
-
-
 # fix various formatting and import issues automatically
 rye run ruff check . --fix
-
-
 
 # use pre-commit to ensure only clean code is commiteed
 rye run pre-commit install -f
 
 # run test to ensure the basic setup is working
-pytest -s -v
+# by default a sqlite in-memory database will be used for testing
+rye run pytest -s -v
 
 # Hack away!!
 
@@ -47,3 +31,24 @@ pytest -s -v
 
 
 See the [generated pyproject.toml](pyproject.toml) for more details on the tools and configurations.
+
+## Create datbase for use with applicaiton
+The database location and credential are read from ```DATABASE_URL``` in ```.env``` file.
+
+```shell
+# create user and database. for PostgreSQL
+psql -U postgres
+
+CREATE USER appuser WITH PASSWORD 'password';
+CREATE DATABASE database OWNER appuser;
+
+
+# create .env file
+echo 'DATABASE_URL="asyncpg://appuser:password@server:port/database??minsize=2&maxsize=10"' > .env
+
+# run schema migration
+source .venv/bin/activate
+aerich upgrade
+
+# ready to go!
+```
