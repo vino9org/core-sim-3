@@ -3,6 +3,7 @@ from decimal import Decimal
 from typing import Type
 
 import ulid
+from tortoise.backends.base.client import BaseDBAsyncClient
 from tortoise.contrib.pydantic import PydanticModel
 from tortoise.expressions import Q
 from tortoise.transactions import in_transaction
@@ -26,7 +27,7 @@ async def get_account_details(account_num: str) -> PydanticModel | None:
 
 
 async def _lock_accounts_for_transfer_(
-    conn,
+    conn: BaseDBAsyncClient,
     debit_account_num: str,
     credit_account_num: str,
 ) -> tuple[m.AccountModel, m.AccountModel]:

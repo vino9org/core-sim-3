@@ -5,12 +5,17 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "seed.py",
             "type": "debugpy",
             "request": "launch",
-            "program": "${file}",
+            "program": "seed.py",
             "console": "integratedTerminal",
-            "justMyCode": false
+            "justMyCode": false,
+            "args": [
+                "--source",
+                "seed.csv",
+                "--truncate",
+            ]
         },
         {
             "name": "pytest",
