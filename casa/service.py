@@ -33,7 +33,8 @@ async def _lock_accounts_for_transfer_(
 ) -> tuple[m.AccountModel, m.AccountModel]:
     accounts = (
         await m.AccountModel.filter(
-            Q(account_num=debit_account_num) | Q(account_num=credit_account_num), status=m.StatusEnum.ACTIVE
+            Q(account_num=debit_account_num) | Q(account_num=credit_account_num),
+            status=m.StatusEnum.ACTIVE,
         )
         .select_for_update()
         .all()
@@ -81,10 +82,12 @@ async def transfer(
         debit_account_balance = debit_account.balance - amount
         debit_account.avail_balance = debit_account_balance
         debit_account.balance = debit_account_balance
+        await debit_account.save(using_db=conn)
 
         credit_account_balance = credit_account.balance + amount
         credit_account.avail_balance = credit_account_balance
         credit_account.balance = credit_account_balance
+        await credit_account.save(using_db=conn)
 
         debit_transction = await m.TransactionModel.create(
             ref_id=ref_id,
