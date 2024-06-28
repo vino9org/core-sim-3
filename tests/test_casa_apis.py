@@ -9,6 +9,7 @@ async def test_get_account_details(client, test_db):
     assert response.status_code == 200
     body = await response.json
     assert body["currency"] == "USD"
+    assert body["balance"] == float("1000.00")
 
 
 async def test_get_account_not_found(client, test_db):
@@ -33,6 +34,7 @@ async def test_transfer_success(client, mocker, test_db):
     assert response.status_code == 201
     body = await response.json
     assert body["trx_id"]
+    assert body["amount"] == float("15.00")
 
     mock.assert_called_once()
     args, _ = mock.call_args

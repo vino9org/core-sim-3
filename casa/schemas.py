@@ -12,13 +12,14 @@ curreny: TypeAlias = Annotated[str, constr(min_length=3, max_length=3)]
 Account = pydantic_model_creator(
     AccountModel,
     name="Account",
-    exclude=("id",),
+    exclude=("id", "updated_at"),
 )
+
 
 Transfer = pydantic_model_creator(
     TransferModel,
     name="Transfer",
-    exclude=("id",),
+    exclude=("id", "created_at"),
 )
 
 

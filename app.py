@@ -2,8 +2,10 @@ import json
 import logging
 import logging.config
 import os
+from decimal import Decimal
 from pathlib import Path
 
+import orjson
 from dotenv import load_dotenv
 from flask_orjson import OrjsonProvider
 from quart import Quart
@@ -18,8 +20,18 @@ with open(Path(__file__).parent / "logger_config.json", "r") as f:
     logging.config.dictConfig(json.load(f))
 
 
+class CustomOrjsonProvider(OrjsonProvider):
+    def dumps(self, obj, **kwargs):
+        def custom_encoder(obj):
+            if isinstance(obj, Decimal):
+                return float(obj)
+            raise TypeError
+
+        return orjson.dumps(obj, default=custom_encoder).decode()
+
+
 app = Quart(__name__)
-app.json = OrjsonProvider(app)
+app.json = CustomOrjsonProvider(app)
 
 
 @app.get("/healthz")
