@@ -33,36 +33,44 @@ async def test_transfer_success(client, mocker, test_db):
         "memo": "test transfer",
     }
 
-    debit_account_before = (
-        await m.AccountModel.filter(account_num=debit_account_num).prefetch_related("transactions").first()
+    debit_before = (
+        await m.AccountModel.filter(account_num=debit_account_num)
+        .prefetch_related("transactions")
+        .first()
     )
-    credit_account_before = (
-        await m.AccountModel.filter(account_num=credit_account_num).prefetch_related("transactions").first()
+    credit_before = (
+        await m.AccountModel.filter(account_num=credit_account_num)
+        .prefetch_related("transactions")
+        .first()
     )
-    assert debit_account_before
-    assert credit_account_before
+    assert debit_before
+    assert credit_before
 
     mock = mocker.patch("casa.api.service.publish_events")
     response = await client.post("/api/casa/transfers", json=payload)
 
-    debit_account_after = (
-        await m.AccountModel.filter(account_num=debit_account_num).prefetch_related("transactions").first()
+    debit_after = (
+        await m.AccountModel.filter(account_num=debit_account_num)
+        .prefetch_related("transactions")
+        .first()
     )
-    credit_account_after = (
-        await m.AccountModel.filter(account_num=credit_account_num).prefetch_related("transactions").first()
+    credit_after = (
+        await m.AccountModel.filter(account_num=credit_account_num)
+        .prefetch_related("transactions")
+        .first()
     )
-    assert debit_account_after
-    assert credit_account_after
+    assert debit_after
+    assert credit_after
 
     assert response.status_code == 201
     body = await response.json
 
     assert body["trx_id"]
     assert body["amount"] == float("15.00")
-    assert (debit_account_before.balance - debit_account_after.balance) == Decimal(amount)
-    assert (credit_account_after.balance - credit_account_before.balance) == Decimal(amount)
-    assert len(credit_account_after.transactions) == len(credit_account_before.transactions) + 1
-    assert len(debit_account_after.transactions) == len(credit_account_before.transactions) + 1
+    assert (debit_before.balance - debit_after.balance) == Decimal(amount)
+    assert (credit_after.balance - credit_before.balance) == Decimal(amount)
+    assert len(credit_after.transactions) == len(credit_before.transactions) + 1
+    assert len(debit_after.transactions) == len(credit_before.transactions) + 1
 
     mock.assert_called_once()
     args, _ = mock.call_args

@@ -53,9 +53,10 @@ omit = [
 # https://docs.astral.sh/ruff/configuration/
 
 [tool.ruff]
-line-length = 120
+line-length = 90
 indent-width = 4
 exclude = [".git", "__pycache__", "venv", ".venv"]
+
 
 [tool.ruff.lint]
 select = [
@@ -67,6 +68,10 @@ select = [
     "A",
 ] # Enable checks for PEP8, imports, and other standard rules
 ignore = ["E203", "E266"]
+
+[tool.ruff.lint.per-file-ignores]
+"migrations/*.py" = ["E501"] # Ignore line too long for auto-generated migration files
+
 
 [tool.mypy]
 warn_return_any = false

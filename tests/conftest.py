@@ -43,7 +43,9 @@ def test_db(request, event_loop):
     event_loop.run_until_complete(seed_db())
 
     if os.environ.get("KEEP_TEST_DB", "N").upper() not in ["Y", "1"]:
-        request.addfinalizer(lambda: event_loop.run_until_complete(Tortoise._drop_databases()))
+        request.addfinalizer(
+            lambda: event_loop.run_until_complete(Tortoise._drop_databases())
+        )
 
 
 async def seed_db():

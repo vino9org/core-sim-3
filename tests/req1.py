@@ -37,7 +37,10 @@ def get_account(url, account_num):
 
 def transfer_request(url, payload):
     req = request.Request(
-        url, data=json.dumps(payload).encode(), headers={"Content-Type": "application/json"}, method="POST"
+        url,
+        data=json.dumps(payload).encode(),
+        headers={"Content-Type": "application/json"},
+        method="POST",
     )
     with request.urlopen(req) as response:
         print(response.status)
