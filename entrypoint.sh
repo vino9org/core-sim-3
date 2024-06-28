@@ -21,4 +21,4 @@ if [ -f "newrelic.ini" ]; then
     WRAPPER="newrelic-admin run-program "
 fi
 
-$WRAPPER hypercorn app:app -b 0.0.0.0:8000 -w ${WORKERS:-1} 
+$WRAPPER hypercorn app:app -b 0.0.0.0:5000 -w ${WORKERS:-1}

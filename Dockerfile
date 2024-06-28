@@ -29,4 +29,4 @@ COPY --chown=app:app . .
 
 ENV PATH="/app/venv/bin:$PATH"
 CMD  ["/bin/sh", "/app/entrypoint.sh"]
-EXPOSE 8000
+EXPOSE 5000
