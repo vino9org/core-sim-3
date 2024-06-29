@@ -5,17 +5,20 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "seed.py",
+            "name": "current file",
             "type": "debugpy",
             "request": "launch",
-            "program": "seed.py",
+            "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": false,
-            "args": [
-                "--source",
-                "seed.csv",
-                "--truncate",
-            ]
+        },
+        {
+            "name": "quart",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "app.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
         },
         {
             "name": "pytest",

@@ -10,7 +10,7 @@ async def test_get_account_details(client, test_db):
     assert response.status_code == 200
     body = await response.json
     assert body["currency"] == "USD"
-    assert body["balance"] == float("1000.00")
+    assert Decimal(body["balance"]) == Decimal("1000.00")
 
 
 async def test_get_account_not_found(client, test_db):
@@ -21,7 +21,7 @@ async def test_get_account_not_found(client, test_db):
 async def test_transfer_success(client, mocker, test_db):
     debit_account_num = "0987654321"
     credit_account_num = "1234567890"
-    amount = 15.0
+    amount = Decimal("15.01")
 
     payload = {
         "ref_id": uuid4().hex,
@@ -29,7 +29,7 @@ async def test_transfer_success(client, mocker, test_db):
         "debit_account_num": debit_account_num,
         "credit_account_num": credit_account_num,
         "currency": "USD",
-        "amount": amount,
+        "amount": str(amount),
         "memo": "test transfer",
     }
 
@@ -66,7 +66,7 @@ async def test_transfer_success(client, mocker, test_db):
     body = await response.json
 
     assert body["trx_id"]
-    assert body["amount"] == float("15.00")
+    assert Decimal(body["amount"]) == amount
     assert (debit_before.balance - debit_after.balance) == Decimal(amount)
     assert (credit_after.balance - credit_before.balance) == Decimal(amount)
     assert len(credit_after.transactions) == len(credit_before.transactions) + 1
@@ -86,7 +86,7 @@ async def test_transfer_with_bad_account(client, test_db):
         "debit_account_num": "0987654321",
         "credit_account_num": "bad_account",
         "currency": "USD",
-        "amount": 15.00,
+        "amount": "15.00",
         "memo": "test transfer",
     }
 
@@ -100,7 +100,7 @@ async def test_transfer_incomplete_request(client, test_db):
         "debit_account_num": "0987654321",
         "credit_account_num": "bad_account",
         "currency": "USD",
-        "amount": 15.00,
+        "amount": "15.00",
         "memo": "test transfer",
     }
 
