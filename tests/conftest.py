@@ -5,13 +5,10 @@ from datetime import datetime
 from uuid import uuid4
 
 import pytest
-import tortoise.contrib.test as tortoise_test
 import ulid
-from tortoise import Tortoise
 
-# from tortoise.contrib.test import _init_db, getDBConfig
 from app import app
-from casa.models import AccountModel, TransactionModel, TransferModel
+from casa import models as m
 
 # suppress INFO logs to reduce noise in test output
 root_logger = logging.getLogger()
@@ -36,6 +33,9 @@ def event_loop():
 
 @pytest.fixture(scope="session")
 def test_db(request, event_loop):
+    import tortoise.contrib.test as tortoise_test
+    from tortoise import Tortoise
+
     test_db_url = os.environ.get("TEST_DATABASE_URL", "sqlite://:memory:")
     tortoise_test._TORTOISE_TEST_DB = test_db_url
     config = tortoise_test.getDBConfig(app_label="models", modules=["casa.models"])
@@ -51,13 +51,13 @@ def test_db(request, event_loop):
 async def seed_db():
     # seed the database with some test data
     today = datetime.now().strftime("%Y-%m-%d")
-    account1 = await AccountModel.create(
+    account1 = await m.AccountModel.create(
         account_num="1234567890",
         currency="USD",
         balance=1000.00,
         avail_balance=1000.00,
     )
-    account2 = await AccountModel.create(
+    account2 = await m.AccountModel.create(
         account_num="0987654321",
         currency="USD",
         balance=500.00,
@@ -67,7 +67,7 @@ async def seed_db():
     ref_id = uuid4().hex
     trx_id = ulid.new().str
 
-    await TransactionModel.create(
+    await m.TransactionModel.create(
         trx_id=trx_id,
         ref_id=ref_id,
         trx_date=today,
@@ -78,7 +78,7 @@ async def seed_db():
         running_balance=1000.00,
     )
 
-    await TransactionModel.create(
+    await m.TransactionModel.create(
         trx_id=trx_id,
         ref_id=ref_id,
         trx_date=today,
@@ -89,7 +89,7 @@ async def seed_db():
         running_balance=500.00,
     )
 
-    await TransferModel.create(
+    await m.TransferModel.create(
         trx_id=trx_id,
         ref_id=ref_id,
         trx_date=today,

@@ -12,7 +12,6 @@ from quart import Quart
 from tortoise.contrib.quart import register_tortoise
 
 from casa.api import blueprint as casa_api
-from casa.models import AccountModel  # noqa
 
 load_dotenv()
 
