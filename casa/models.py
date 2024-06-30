@@ -34,6 +34,7 @@ class AccountModel(Model):
 
 class TransactionModel(Model):
     id = f.IntField(primary_key=True)
+    trx_id = f.CharField(max_length=32)
     trx_date = f.CharField(max_length=10, db_index=True)
     currency = f.CharField(max_length=3)
     amount = f.DecimalField(max_digits=14, decimal_places=2)
