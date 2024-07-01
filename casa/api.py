@@ -36,7 +36,7 @@ async def transfer():
         return result.model_dump(), 201
     except (service.InvalidRequest, ValidationError) as e:
         logger.info(f"Invalid request: {str(e)}")
-        return Response({"error": str(e)}, status=422)
+        return {"error": str(e)}, 422
     except Exception as e:
         logger.warn(f"Unexpected expection: {str(e)}")
-        return Response({"error": str(e)}, status=500)
+        return {"error": str(e)}, 500

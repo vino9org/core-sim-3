@@ -3,6 +3,7 @@ import json
 import sys
 from datetime import datetime
 from urllib import request
+from urllib.error import HTTPError
 from uuid import uuid4
 
 #
@@ -42,9 +43,12 @@ def transfer_request(url, payload):
         headers={"Content-Type": "application/json"},
         method="POST",
     )
-    with request.urlopen(req) as response:
-        print(response.status)
-        print(json.dumps(json.loads(response.read()), indent=4))
+    try:
+        with request.urlopen(req) as response:
+            print(response.status)
+            print(json.dumps(json.loads(response.read()), indent=4))
+    except HTTPError as e:
+        print(f"http_status={e.code},{e.read().decode()}")
 
 
 def parse_commandline_options(args):
@@ -85,7 +89,7 @@ def parse_commandline_options(args):
 
 if __name__ == "__main__":
     args = parse_commandline_options(sys.argv[1:])
-    print(args)
+    # print(args)
     if args.api == "transfer":
         transfer_request(
             f"{args.host}/transfers",
@@ -93,3 +97,5 @@ if __name__ == "__main__":
         )
     elif args.api == "account":
         get_account(f"{args.host}/accounts", args.source)
+    else:
+        print(f"unknown api: {args.api}")
