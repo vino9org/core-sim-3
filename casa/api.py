@@ -34,7 +34,10 @@ async def transfer():
         current_app.add_background_task(service.publish_events, events)
         logger.info(f"created transfer {result.trx_id} for amount {result.amount}")
         return result.model_dump(), 201
-    except (service.InvalidRequest, ValidationError) as e:
+    except ValidationError as e:
+        logger.info(f"Validation request: {str(e.errors)}")
+        return {"error": "Validation Error"}, 422
+    except service.InvalidRequest as e:
         logger.info(f"Invalid request: {str(e)}")
         return {"error": str(e)}, 422
     except Exception as e:
