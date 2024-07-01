@@ -13,6 +13,7 @@ dependencies = [
     "tortoise-orm[asyncpg]>=0.21.3",
     "flask-orjson>=2.0.0",
     "aerich>=0.7.2",
+    "newrelic>=9.11.0",
 ]
 
 [tool.rye]

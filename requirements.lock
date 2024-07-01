@@ -53,6 +53,7 @@ markupsafe==2.1.5
     # via jinja2
     # via quart
     # via werkzeug
+newrelic==9.11.0
 orjson==3.10.5
     # via flask-orjson
 priority==2.0.0

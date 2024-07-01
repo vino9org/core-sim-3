@@ -27,3 +27,6 @@ cdk.out
 
 # data files
 *.csv
+
+# file contains license key
+newrelic.ini
