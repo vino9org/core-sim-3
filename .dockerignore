@@ -10,3 +10,4 @@
 !*.py
 !migrations/
 !casa
+!logger_config.json
