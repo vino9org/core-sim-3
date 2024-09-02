@@ -11,8 +11,8 @@ RUN apt-get update \
 # create virtualenv and install dependencies
 RUN python -m venv /app/venv
 ENV PATH="/app/venv/bin:$PATH"
-COPY requirements.lock .
-RUN pip install --no-cache-dir -r requirements.lock
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
 # stage 2: runtime
 FROM python:3.12-slim-bookworm
