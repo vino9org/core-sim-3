@@ -10,6 +10,10 @@ from tortoise import Tortoise
 
 from casa.models import AccountModel, StatusEnum
 
+"""
+Utility to create accounts with random balances for load testing
+"""
+
 __BALANCE_BUCKETS__ = [100.0, 500.0, 1000.0, 50000.0, 10000000.0]
 
 
