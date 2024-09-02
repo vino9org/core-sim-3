@@ -111,6 +111,7 @@ jobs:
       with:
         # use path context so that .dockerignore will be processed.
         context: .
+        provenance: false
         platforms: "linux/amd64,linux/arm64"
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.meta.outputs.tags }}
