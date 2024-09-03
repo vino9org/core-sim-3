@@ -28,6 +28,9 @@ pytest -s -v
 # Run the server
 quart run
 
+# see OpenAPI docs
+Browse to ```http://localhost:5000/docs```
+
 ```
 
 
