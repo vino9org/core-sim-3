@@ -7,7 +7,7 @@ from tortoise.contrib.pydantic import pydantic_model_creator
 from .models import AccountModel, TransferModel
 
 positive: TypeAlias = Annotated[float, Gt(0)]
-curreny: TypeAlias = Annotated[str, constr(min_length=3, max_length=3)]
+currency: TypeAlias = Annotated[str, constr(min_length=3, max_length=3)]
 
 Account = pydantic_model_creator(
     AccountModel,
@@ -28,6 +28,6 @@ class TransferRequest(BaseModel):
     trx_date: str
     debit_account_num: str
     credit_account_num: str
-    currency: curreny
+    currency: currency
     amount: positive
     memo: str
