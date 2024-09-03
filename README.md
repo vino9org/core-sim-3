@@ -8,23 +8,28 @@ This a core banking simulator used in vino bank demo. It build with [Quart](http
 
 ```shell
 
-# the easiest way to install Rye
-curl -sSf https://rye.astral.sh/get | bash
+# the easiest way to install uv
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # create virtualenv and install dependencies
-rye sync
+uv sync
+source .venv/bin/activate
 
 # fix various formatting and import issues automatically
-rye run ruff check . --fix
+ruff check . --fix
 
 # use pre-commit to ensure only clean code is commiteed
-rye run pre-commit install -f
+pre-commit install -f
 
 # run test to ensure the basic setup is working
 # by default a sqlite in-memory database will be used for testing
-rye run pytest -s -v
+pytest -s -v
 
-# Hack away!!
+# Run the server
+quart run
+
+# see OpenAPI docs
+Browse to ```http://localhost:5000/docs```
 
 ```
 

@@ -14,6 +14,7 @@ dependencies = [
     "flask-orjson>=2.0.0",
     "aerich>=0.7.2",
     "newrelic>=9.11.0",
+    "quart-schema>=0.20.0",
 ]
 
 [tool.uv]
@@ -39,6 +40,7 @@ filterwarnings = [
 ]
 env_files = [".env"]
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 
 [tool.coverage.run]
 source = ["."]

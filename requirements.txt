@@ -68,6 +68,8 @@ pydantic==2.8.2
     #   tortoise-orm
 pydantic-core==2.20.1
     # via pydantic
+pyhumps==3.8.0
+    # via quart-schema
 pypika-tortoise==0.1.6
     # via tortoise-orm
 python-dotenv==1.0.1
@@ -77,6 +79,10 @@ python-dotenv==1.0.1
 pytz==2024.1
     # via tortoise-orm
 quart==0.19.6
+    # via
+    #   core-sim-3 (pyproject.toml)
+    #   quart-schema
+quart-schema==0.20.0
     # via core-sim-3 (pyproject.toml)
 tomlkit==0.13.2
     # via aerich

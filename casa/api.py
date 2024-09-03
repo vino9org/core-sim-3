@@ -2,6 +2,7 @@ import logging
 
 from pydantic import ValidationError
 from quart import Blueprint, Response, current_app, request
+from quart_schema import document_request, document_response
 
 from . import schemas as s
 from . import service
@@ -12,6 +13,7 @@ blueprint = Blueprint("casa", __name__)
 
 
 @blueprint.route("/accounts/<account_num>", methods=["GET"])
+@document_response(s.Account)
 async def get_account_details(
     account_num: str,
 ):
@@ -27,6 +29,9 @@ async def get_account_details(
 
 
 @blueprint.route("/transfers", methods=["POST"])
+# validate request seems to have some weird behavior, so we opt for document only for now
+@document_request(s.TransferRequest)
+@document_response(s.Transfer, 201)
 async def transfer():
     try:
         transfer_req = s.TransferRequest.model_validate(await request.json)
