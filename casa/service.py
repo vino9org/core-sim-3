@@ -1,6 +1,5 @@
 import logging
 from decimal import Decimal
-from typing import Type
 
 import ulid
 from tortoise.backends.base.client import BaseDBAsyncClient
@@ -23,7 +22,10 @@ class InvalidRequest(Exception):
 
 async def get_account_details(account_num: str) -> PydanticModel | None:
     model = await m.AccountModel.filter(account_num=account_num).first()
-    return await s.Account.from_tortoise_orm(model) if model else None
+    if model:
+        return await s.Account.from_tortoise_orm(model)
+    else:
+        return None
 
 
 async def _lock_accounts_for_transfer_(
@@ -54,7 +56,7 @@ async def _lock_accounts_for_transfer_(
 
 async def transfer(
     transfer_req: s.TransferRequest,
-) -> tuple[PydanticModel, list[tuple[Type[m.TransactionModel], int]]]:
+) -> tuple[PydanticModel, list[m.TransactionModel]]:
     """
     perform a transfer and returns:
     1. transfer object
@@ -89,7 +91,7 @@ async def transfer(
         credit_account.balance = credit_account_balance
         await credit_account.save(using_db=conn)
 
-        debit_transction = await m.TransactionModel.create(
+        debit_transaction = await m.TransactionModel.create(
             ref_id=ref_id,
             trx_date=trx_date,
             trx_id=trx_id,
@@ -100,7 +102,7 @@ async def transfer(
             running_balance=debit_account_balance,
         )
 
-        credit_transction = await m.TransactionModel.create(
+        credit_transaction = await m.TransactionModel.create(
             ref_id=ref_id,
             trx_date=trx_date,
             trx_id=trx_id,
@@ -124,16 +126,13 @@ async def transfer(
         )
 
         result = await s.Transfer.from_tortoise_orm(transfer_model)
-        events = [
-            (m.TransactionModel, credit_transction.id),
-            (m.TransactionModel, debit_transction.id),
-        ]
+        events = [credit_transaction, debit_transaction]
 
         return result, events
 
 
-def publish_events(events: list[tuple[Type[m.ModelT], int]]) -> int:
+def publish_events(events: list[m.ModelT]) -> int:
     for e in events:
-        msg = f"publishing event for {e[0].__name__}({e[1]})"
+        msg = f"publishing event for {e.__class__}({e})"
         logger.debug(msg)
     return len(events)

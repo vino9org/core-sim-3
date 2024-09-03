@@ -8,6 +8,7 @@ from .models import AccountModel, TransferModel
 
 positive: TypeAlias = Annotated[float, Gt(0)]
 currency: TypeAlias = Annotated[str, constr(min_length=3, max_length=3)]
+trxdate: TypeAlias = Annotated[str, constr(pattern=r"^\d{4}-\d{2}-\d{2}$")]
 
 Account = pydantic_model_creator(
     AccountModel,
@@ -25,7 +26,7 @@ Transfer = pydantic_model_creator(
 
 class TransferRequest(BaseModel):
     ref_id: str
-    trx_date: str
+    trx_date: trxdate
     debit_account_num: str
     credit_account_num: str
     currency: currency
