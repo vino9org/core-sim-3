@@ -29,7 +29,7 @@ pytest -s -v
 quart run
 
 # see OpenAPI docs
-Browse to ```http://localhost:5000/docs```
+Browse to ```http://localhost:8000/docs```
 
 ```
 

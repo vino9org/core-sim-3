@@ -1,50 +1,38 @@
 import logging
 
-from pydantic import ValidationError
-from quart import Blueprint, Response, current_app, request
-from quart_schema import document_request, document_response
+from fastapi import APIRouter, BackgroundTasks, HTTPException
+from tortoise.contrib.pydantic import PydanticModel
 
 from . import schemas as s
 from . import service
 
 logger = logging.getLogger(__name__)
 
-blueprint = Blueprint("casa", __name__)
+router = APIRouter(prefix="/api/casa")
 
 
-@blueprint.route("/accounts/<account_num>", methods=["GET"])
-@document_response(s.Account)
-async def get_account_details(
-    account_num: str,
-):
+@router.get("/accounts/{account_num}", response_model=s.Account)
+async def get_account_details(account_num: str) -> PydanticModel:
+    account = await service.get_account_details(account_num)
+    if account:
+        return account
+
+    raise HTTPException(status_code=404, detail="Account not found or inactive")
+
+
+@router.post("/transfers", response_model=s.Transfer, status_code=201)
+async def transfer(
+    transfer_req: s.TransferRequest,
+    background_tasks: BackgroundTasks,
+) -> PydanticModel:
     try:
-        account = await service.get_account_details(account_num)
-        if account:
-            return account.model_dump()
-        else:
-            return {"error": "Account not found or not active"}, 404
-    except Exception as e:
-        logger.warn(f"Unexpected expection: {str(e)}")
-        return Response({"error": str(e)}, status=500)
-
-
-@blueprint.route("/transfers", methods=["POST"])
-# validate request seems to have some weird behavior, so we opt for document only for now
-@document_request(s.TransferRequest)
-@document_response(s.Transfer, 201)
-async def transfer():
-    try:
-        transfer_req = s.TransferRequest.model_validate(await request.json)
-        result, events = await service.transfer(transfer_req)
-        current_app.add_background_task(service.publish_events, events)
-        logger.info(f"created transfer {result.trx_id} for amount {result.amount}")
-        return result.model_dump(), 201
-    except ValidationError as e:
-        logger.info(f"Validation request: {str(e.errors)}")
-        return {"error": "Validation Error"}, 422
+        transfer, transactions = await service.transfer(transfer_req)
+        background_tasks.add_task(service.publish_events, transactions)
+        logger.info(f"processed request: {transfer_req.ref_id}")
+        return transfer
     except service.InvalidRequest as e:
-        logger.info(f"Invalid request: {str(e)}")
-        return {"error": str(e)}, 422
+        logger.info(f"request is invalid: {transfer_req.ref_id}")
+        raise HTTPException(status_code=422, detail=str(e))
     except Exception as e:
-        logger.warn(f"Unexpected expection: {str(e)}")
-        return {"error": str(e)}, 500
+        logger.exception(f"An error occured: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))

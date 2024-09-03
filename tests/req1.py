@@ -57,7 +57,7 @@ def parse_commandline_options(args):
         "-H",
         "--host",
         dest="host",
-        default="http://localhost:5000/api/casa",
+        default="http://localhost:8000/api/casa",
     )
     parser.add_argument(
         "--api",

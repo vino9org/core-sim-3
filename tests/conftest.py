@@ -1,24 +1,44 @@
 import asyncio
 import logging
 import os
+from contextlib import asynccontextmanager
 from datetime import datetime
+from typing import AsyncGenerator
 from uuid import uuid4
 
 import pytest
 import ulid
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
+from tortoise import Tortoise
+from tortoise.contrib.fastapi import RegisterTortoise
 
-from app import app
 from casa import models as m
+from main import app, lifespan, tortoise_conf
 
 # suppress INFO logs to reduce noise in test output
 root_logger = logging.getLogger()
 root_logger.setLevel(logging.WARN)
 
 
-@pytest.fixture
+@asynccontextmanager
+async def lifespan_test(app: FastAPI) -> AsyncGenerator[None, None]:
+    test_databae_url = os.environ.get("TEST_DATABASE_URL", "sqlite://:memory:")
+    async with RegisterTortoise(
+        app,
+        config=tortoise_conf(app, test_databae_url),
+        generate_schemas=False,
+    ):
+        yield
+        await Tortoise.close_connections()
+
+
+app.dependency_overrides[lifespan] = lifespan_test
+
+
+@pytest.fixture(scope="session")
 async def client():
-    async with app.test_client() as client:
-        yield client
+    yield TestClient(app)
 
 
 @pytest.fixture(scope="session")
@@ -34,7 +54,6 @@ def event_loop():
 @pytest.fixture(scope="session")
 def test_db(request, event_loop):
     import tortoise.contrib.test as tortoise_test
-    from tortoise import Tortoise
 
     test_db_url = os.environ.get("TEST_DATABASE_URL", "sqlite://:memory:")
     tortoise_test._TORTOISE_TEST_DB = test_db_url
@@ -42,10 +61,10 @@ def test_db(request, event_loop):
     event_loop.run_until_complete(tortoise_test._init_db(config))
     event_loop.run_until_complete(seed_db())
 
+    yield
+
     if os.environ.get("KEEP_TEST_DB", "N").upper() not in ["Y", "1"]:
-        request.addfinalizer(
-            lambda: event_loop.run_until_complete(Tortoise._drop_databases())
-        )
+        event_loop.run_until_complete(Tortoise._drop_databases())
 
 
 async def seed_db():

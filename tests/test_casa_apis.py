@@ -6,15 +6,15 @@ from casa import models as m
 
 
 async def test_get_account_details(client, test_db):
-    response = await client.get("/api/casa/accounts/1234567890")
+    response = client.get("/api/casa/accounts/1234567890")
     assert response.status_code == 200
-    body = await response.json
+    body = response.json()
     assert body["currency"] == "USD"
     assert Decimal(body["balance"]) == Decimal("1000.00")
 
 
 async def test_get_account_not_found(client, test_db):
-    response = await client.get("/api/casa/accounts/bad_account")
+    response = client.get("/api/casa/accounts/bad_account")
     assert response.status_code == 404
 
 
@@ -47,7 +47,7 @@ async def test_transfer_success(client, mocker, test_db):
     assert credit_before
 
     mock = mocker.patch("casa.api.service.publish_events")
-    response = await client.post("/api/casa/transfers", json=payload)
+    response = client.post("/api/casa/transfers", json=payload)
 
     debit_after = (
         await m.AccountModel.filter(account_num=debit_account_num)
@@ -63,7 +63,7 @@ async def test_transfer_success(client, mocker, test_db):
     assert credit_after
 
     assert response.status_code == 201
-    body = await response.json
+    body = response.json()
 
     assert body["trx_id"]
     assert Decimal(body["amount"]) == amount
@@ -75,7 +75,7 @@ async def test_transfer_success(client, mocker, test_db):
     mock.assert_called_once()
     args, _ = mock.call_args
     assert len(args[0]) == 2
-    assert issubclass(m.TransactionModel, args[0][0][0])
+    assert isinstance(args[0][0], m.TransactionModel)
 
 
 async def test_transfer_with_bad_account(client, test_db):
@@ -90,7 +90,7 @@ async def test_transfer_with_bad_account(client, test_db):
         "memo": "test transfer",
     }
 
-    response = await client.post("/api/casa/transfers", json=payload)
+    response = client.post("/api/casa/transfers", json=payload)
     assert response.status_code == 422
 
 
@@ -104,5 +104,5 @@ async def test_transfer_incomplete_request(client, test_db):
         "memo": "test transfer",
     }
 
-    response = await client.post("/api/casa/transfers", json=payload)
+    response = client.post("/api/casa/transfers", json=payload)
     assert response.status_code == 422
