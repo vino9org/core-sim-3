@@ -5,7 +5,7 @@ from uuid import uuid4
 from casa import models as m
 
 
-async def test_get_account_details(client, test_db):
+async def test_get_account_details(client):
     response = client.get("/api/casa/accounts/1234567890")
     assert response.status_code == 200
     body = response.json()
@@ -13,12 +13,12 @@ async def test_get_account_details(client, test_db):
     assert Decimal(body["balance"]) == Decimal("1000.00")
 
 
-async def test_get_account_not_found(client, test_db):
+async def test_get_account_not_found(client):
     response = client.get("/api/casa/accounts/bad_account")
     assert response.status_code == 404
 
 
-async def test_transfer_success(client, mocker, test_db):
+async def test_transfer_success(client, mocker):
     debit_account_num = "0987654321"
     credit_account_num = "1234567890"
     amount = Decimal("15.01")
@@ -78,7 +78,7 @@ async def test_transfer_success(client, mocker, test_db):
     assert isinstance(args[0][0], m.TransactionModel)
 
 
-async def test_transfer_with_bad_account(client, test_db):
+async def test_transfer_with_bad_account(client):
     # payload with all required fields but invalid account number
     payload = {
         "ref_id": uuid4().hex,
@@ -94,7 +94,7 @@ async def test_transfer_with_bad_account(client, test_db):
     assert response.status_code == 422
 
 
-async def test_transfer_incomplete_request(client, test_db):
+async def test_transfer_incomplete_request(client):
     # payload incomplete, trx_date is required field but not supplied
     payload = {
         "debit_account_num": "0987654321",

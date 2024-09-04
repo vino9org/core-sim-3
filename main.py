@@ -4,7 +4,7 @@ import logging.config
 import os
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Any, AsyncGenerator
+from typing import AsyncGenerator
 
 import uvicorn.logging
 from dotenv import load_dotenv
@@ -15,39 +15,36 @@ from casa.api import router as casa_router
 
 load_dotenv()
 
-access_log_format: str = ""
+LOGGER_CONFIG = {}
 
 with open(Path(__file__).parent / "logger_config.json", "r") as f:
-    config = json.load(f)
-    access_log_format = config["formatters"]["standard"]["format"]
-    logging.config.dictConfig(config)
+    LOGGER_CONFIG = json.load(f)
+    logging.config.dictConfig(LOGGER_CONFIG)
 
 
 def patch_unvicorn_logger():
-    global access_log_format
+    """patch the uvicorn logger to use the same format as the rest of the app"""
+    try:
+        logger = logging.getLogger("uvicorn.access")
+        # the uvicorn.logging is out exposed to the public
+        # we tell mypy to ignore it for now
+        console_formatter = uvicorn.logging.ColourizedFormatter(
+            LOGGER_CONFIG["formatters"]["standard"]["format"]
+        )
+        logger.handlers[0].setFormatter(console_formatter)
+    except IndexError:
+        pass
 
-    logger = logging.getLogger("uvicorn.access")
-    # the uvicorn.logging is out exposed to the public
-    # we tell mypy to ignore it for now
-    console_formatter = uvicorn.logging.ColourizedFormatter(access_log_format)
-    logger.handlers[0].setFormatter(console_formatter)
 
-
-def tortoise_conf(app: FastAPI, databae_url: str = "") -> dict[str, Any]:
-    if not databae_url:
-        databae_url = os.environ.get("DATABASE_URL", "")
-        if not databae_url:
-            raise ValueError("DATABASE_URL not set properly")
-
-    return {
-        "connections": {"default": databae_url},
-        "apps": {
-            "models": {
-                "models": ["casa.models", "aerich.models"],
-                "default_connection": "default",
-            },
+TORTOISE_CONF = {
+    "connections": {"default": os.environ.get("DATABASE_URL", "")},
+    "apps": {
+        "models": {
+            "models": ["casa.models", "aerich.models"],
+            "default_connection": "default",
         },
-    }
+    },
+}
 
 
 @asynccontextmanager
@@ -55,7 +52,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     patch_unvicorn_logger()
     async with RegisterTortoise(
         app,
-        config=tortoise_conf(app),
+        config=TORTOISE_CONF,
         generate_schemas=False,
     ):
         yield

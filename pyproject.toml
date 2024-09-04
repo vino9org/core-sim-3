@@ -35,10 +35,10 @@ pythonpath = ["."]
 testpaths = ["tests"]
 filterwarnings = [
     "ignore::DeprecationWarning",
-    'ignore:configuration option "asyncio_default_fixture_loop_scope" is unset',
 ]
 env_files = [".env"]
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 
 [tool.coverage.run]
 source = ["."]
@@ -89,6 +89,6 @@ module = [
 ignore_missing_imports = true
 
 [tool.aerich]
-tortoise_orm = "app.TORTOISE_ORM"
+tortoise_orm = "main.TORTOISE_CONF"
 location = "./migrations"
 src_folder = "./."

@@ -1,9 +1,9 @@
 import asyncio
-import logging
 import os
 from contextlib import asynccontextmanager
 from datetime import datetime
-from typing import AsyncGenerator
+from pathlib import Path
+from typing import Any, AsyncGenerator
 from uuid import uuid4
 
 import pytest
@@ -12,62 +12,16 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from tortoise import Tortoise
 from tortoise.contrib.fastapi import RegisterTortoise
+from tortoise.exceptions import OperationalError
 
 from casa import models as m
-from main import app, lifespan, tortoise_conf
 
 # suppress INFO logs to reduce noise in test output
-root_logger = logging.getLogger()
-root_logger.setLevel(logging.WARN)
+# root_logger = logging.getLogger()
+# root_logger.setLevel(logging.WARN)
 
 
-@asynccontextmanager
-async def lifespan_test(app: FastAPI) -> AsyncGenerator[None, None]:
-    test_databae_url = os.environ.get("TEST_DATABASE_URL", "sqlite://:memory:")
-    async with RegisterTortoise(
-        app,
-        config=tortoise_conf(app, test_databae_url),
-        generate_schemas=False,
-    ):
-        yield
-        await Tortoise.close_connections()
-
-
-app.dependency_overrides[lifespan] = lifespan_test
-
-
-@pytest.fixture(scope="session")
-async def client():
-    yield TestClient(app)
-
-
-@pytest.fixture(scope="session")
-def event_loop():
-    try:
-        loop = asyncio.get_running_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
-    yield loop
-    loop.close()
-
-
-@pytest.fixture(scope="session")
-def test_db(request, event_loop):
-    import tortoise.contrib.test as tortoise_test
-
-    test_db_url = os.environ.get("TEST_DATABASE_URL", "sqlite://:memory:")
-    tortoise_test._TORTOISE_TEST_DB = test_db_url
-    config = tortoise_test.getDBConfig(app_label="models", modules=["casa.models"])
-    event_loop.run_until_complete(tortoise_test._init_db(config))
-    event_loop.run_until_complete(seed_db())
-
-    yield
-
-    if os.environ.get("KEEP_TEST_DB", "N").upper() not in ["Y", "1"]:
-        event_loop.run_until_complete(Tortoise._drop_databases())
-
-
-async def seed_db():
+async def _seed_db():
     # seed the database with some test data
     today = datetime.now().strftime("%Y-%m-%d")
     account1 = await m.AccountModel.create(
@@ -118,3 +72,88 @@ async def seed_db():
         debit_account_num=account1.account_num,
         credit_account_num=account2.account_num,
     )
+
+
+#
+# database utilites
+#
+
+
+def test_db_path():
+    test_db_path = Path(__name__).parent / "tmp"
+    test_db_path.mkdir(parents=True, exist_ok=True)
+    return f"{test_db_path.resolve()}/test.db"
+
+
+async def _prep_test_db() -> dict[str, Any]:
+    from main import TORTOISE_CONF
+
+    conf = TORTOISE_CONF.copy()
+    conf["connections"]["default"] = os.environ.get(
+        "TEST_DATABASE_URL",
+        f"sqlite://{test_db_path()}",
+    )
+
+    print("*** _prep_test_db ***")
+    try:
+        await Tortoise.init(conf, _create_db=True)
+        await Tortoise.generate_schemas(safe=False)
+        await _seed_db()
+    except OperationalError as e:
+        # database already exists
+        if "already exists" in str(e):
+            await Tortoise.init(conf, _create_db=False)
+
+    return conf
+
+
+async def _cleanup_test_db():
+    if os.environ.get("KEEP_TEST_DB", "N").upper() not in ["Y", "1"]:
+        await Tortoise._drop_databases()
+
+
+#
+# FastAPI lifespan context manager
+#
+@asynccontextmanager
+async def lifespan_test(app: FastAPI) -> AsyncGenerator[None, None]:
+    print("**** lifespan_test ****")
+    conf = await _prep_test_db()
+
+    async with RegisterTortoise(
+        app,
+        config=conf,
+        generate_schemas=False,
+    ):
+        yield
+
+    await _cleanup_test_db()
+
+
+#
+# fixtures
+#
+@pytest.fixture(scope="session")
+def event_loop():
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+    yield loop
+    loop.close()
+
+
+@pytest.fixture(scope="session")
+def test_db(event_loop):
+    event_loop.run_until_complete(_prep_test_db())
+    yield
+    event_loop.run_until_complete(_cleanup_test_db())
+
+
+@pytest.fixture(scope="session")
+async def client():
+    from main import app
+
+    app.router.lifespan_context = lifespan_test
+    with TestClient(app) as client:
+        yield client
