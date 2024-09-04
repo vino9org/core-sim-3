@@ -75,7 +75,7 @@ async def test_transfer_success(client, mocker, test_db):
     mock.assert_called_once()
     args, _ = mock.call_args
     assert len(args[0]) == 2
-    assert issubclass(m.TransactionModel, args[0][0][0])
+    assert isinstance(args[0][0], m.TransactionModel)
 
 
 async def test_transfer_with_bad_account(client, test_db):
